@@ -1,0 +1,82 @@
+{% extends "base.html" %} 
+
+{% block title %}Home{% endblock %} 
+
+
+{% block content %}
+
+<body>
+<h1 align="center">Request</h1>
+
+
+
+ <ul class="list-group list-group-flush" id="Request">
+
+   {% for Request in requests %}
+   <!-- Loop through each Request associated with the current user. -->
+   
+
+   <li class="list-group-item"> 
+
+      <strong>{{ Request.requested_for_email }}</strong> access: {{ Request.access_level }} created on: {{ Request.created_at }}
+            ~ Added By: {{ Request.requester.email }}
+      <!-- Displays the Request content. -->
+
+      <button type="button" class="btn btn-outline-dark" onClick="openUpdateModal('{{ Request.id }}', '{{ Request.requested_for_email }}', '{{ Request.access_level }}')">Update</button>
+
+      <button type="button" class="close" onClick="deleteRequest('{{ Request.id }}')">
+         <!-- Button to delete the Request. Calls the JavaScript function `deleteRequest` and passes the Request's ID. -->
+
+         <span aria-hidden="true">&times;</span> 
+      </button>
+   </li> 
+   {% endfor %}
+ </ul>
+
+<form method="POST">
+   <!-- Form to add a new note. Uses POST method to submit data. -->
+
+   <div class="form-group">
+      <label for="name">requested for email</label>
+      <input type="text" class="form-control" id="requested_for_email" name="requested_for_email" required />
+   </div>
+  <div class="form-group">
+   <label for="name">access level</label>
+   <input type="text" class="form-control" id="access_level" name="access_level" required />
+  </div>
+
+   <br />
+   <div align="center">
+      <button type="submit" class="btn btn-primary">Add Request</button>
+   </div>
+</form>
+
+<!--Modal popup created to update Certification-->
+<div class="modal" id="updateRequestModal" >
+   <div class="modal-content">
+      <h3>Update Requests
+      </h3>
+      <form id="updateRequest" method="PUT">
+         <input type="hidden" id="requestId" name="requestId">
+         <div class="form group">
+            <label>
+                
+            </label>
+            <input class="form-control" type = "text" id="updateRequestedForEmail">
+         </div>
+         <div class="form group">
+            <label>
+                
+            </label>
+            <input class="form-control" type = "text" id="updateAccessLevel">
+         </div>
+      </br>
+         <button type="button" class="btn btn-primary" id="saveUpdateBtn" >Save changes</button>
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </form>
+   </div>
+</div>
+<script src="script.js"></script>
+</body> 
+
+{% endblock %}

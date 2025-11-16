@@ -1,0 +1,32 @@
+{% extends "base.html" %} 
+
+
+<title>{% block title %}Users{% endblock %}</title> 
+
+
+{% block content %} 
+
+
+<h2 align="center">Users</h2>
+
+<ul class="list-group list-group-flush" id="Users">
+   {% for User in users %}
+
+   <li class="list-group-item"> 
+
+      <strong>{{ User.email }}</strong> Role: {{ User.role }} Name: {{ User.first_name }}
+      <!-- Displays the User information. -->
+
+      <button type="button" class="btn btn-outline-dark" onClick="openUpdateModal('{{ User.id }}', '{{ User.email }}', '{{ User.role }}')">Update</button>
+
+      <button type="button" class="close" onClick="deleteRequest('{{ User.id }}')">
+         <!-- Button to delete the User. Calls the JavaScript function `deleteRequest` and passes the User's ID. -->
+
+         <span aria-hidden="true">&times;</span> 
+      </button>
+   </li>
+   
+   {% endfor %}
+</ul>
+
+{% endblock %}
