@@ -62,6 +62,35 @@ def home():
     # Render the home template and pass the current user object
     return render_template("home.html", user=current_user, requests=requests)
 
+
+@views.route('/update_user', methods=['PUT','GET'])
+@login_required
+def update_user():
+    user_id = request.get.json().get('user_id')
+    email = request.get.json().get('email')
+    role = request.get.json().get('role')
+    user_obj = User.query.get(user_id)
+    admin_count = User.query.filter_by(role=2).count()
+
+    if current_user.role != 2:
+        flash('Only Admins can update user roles.', category='error')
+    elif not user_obj:
+        flash('User not found!', category = 'error')
+    elif len(email) < 1:
+        flash('Email is required!', category='error')
+    elif len(email) > 200:
+        flash('Email is too long!', category='error')
+    elif role not in ["0", "1", "2"]:
+        flash (f"Invalid role: {role}. Must be one of Regular User, Requester, or Admin.", category='error')
+    elif user_obj.role == 2 and admin_count <= 1:
+        flash('Cannot change the role of the last Admin user.', category='error')
+    else:
+        user_obj.email = email
+        user_obj.role = role
+        db.session.commit()
+        flash('User updated successfully', category='success')
+    return jsonify({})
+
 # Update request route
 @views.route('/update_request', methods=['PUT','GET'])
 @login_required

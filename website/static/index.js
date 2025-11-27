@@ -93,6 +93,17 @@ function openUpdateModal(RequestId, requestedForEmail, accessLevel) {
     updateModal.show();
 }
 
+function openUpdateUserModal(UserId, UserEmail, UserRole) {
+    // Populate the modal with existing data
+    document.getElementById("userId").value = UserId;
+    document.getElementById("updateUserEmail").value = UserEmail;
+    document.getElementById("updateUserRole").value = UserRole;
+    // Show the modal
+    const updateModal = new bootstrap.Modal(document.getElementById("updateUserModal"));
+    updateModal.show();
+}
+
+
 document.getElementById("saveUpdateBtn").addEventListener("click", function () {
     const requestId = document.getElementById("requestId").value;
     const requestedForEmail = document.getElementById("updateRequestedForEmail").value;
