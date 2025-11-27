@@ -14,7 +14,7 @@
 
    <li class="list-group-item"> 
 
-      <strong>{{ User.email }}</strong> Role: {{ User.role }} Name: {{ User.first_name }}
+      <strong>Email:</strong> {{ User.email }} <strong>Role:</strong> {% if User.role == 0 %} Viewer {% elif User.role == 1 %} Manager {% elif User.role == 2 %} Admin {% endif %} <strong>Name:</strong> {{ User.first_name }}
       <!-- Displays the User information. -->
 
       <button type="button" class="btn btn-outline-dark" onClick="openUpdateUserModal('{{ User.id }}', '{{ User.email }}', '{{ User.role }}')">Update</button>
@@ -52,7 +52,7 @@
             </select>
          </div>
          <br />
-         <button type="button" class="btn btn-primary" id="saveUpdateBtn" >Save changes</button>
+         <button type="button" class="btn btn-primary" id="saveUpdateUserBtn" >Save changes</button>
          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </form>
    </div>

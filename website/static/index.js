@@ -104,7 +104,9 @@ function openUpdateUserModal(UserId, UserEmail, UserRole) {
 }
 
 
-document.getElementById("saveUpdateBtn").addEventListener("click", function () {
+const saveUpdateBtn = document.getElementById("saveUpdateBtn");
+if (saveUpdateBtn) {
+    saveUpdateBtn.addEventListener("click", function () {
     const requestId = document.getElementById("requestId").value;
     const requestedForEmail = document.getElementById("updateRequestedForEmail").value;
     const accessLevel = document.getElementById("updateAccessLevel").value;
@@ -136,3 +138,40 @@ document.getElementById("saveUpdateBtn").addEventListener("click", function () {
     })
     .catch(error => console.error("Error:", error));
 });
+}
+
+const saveUpdateUserBtn = document.getElementById("saveUpdateUserBtn");
+if (saveUpdateUserBtn) {
+    saveUpdateUserBtn.addEventListener("click", function () {
+    const userId = document.getElementById("userId").value;
+    const userEmail = document.getElementById("updateUserEmail").value;
+    const userRole = document.getElementById("updateUserRole").value;
+    // Debug: Check if userId is set
+    console.log("User ID Sent:", userId);
+
+    if (!userId) {
+        alert("Error: Missing User ID.");
+        return;
+    }
+
+    fetch("/update_user", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: userId,  
+            email: userEmail,
+            role: userRole
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+        }
+        window.location.href = "/Users";
+    })
+    .catch(error => console.error("Error:", error));
+});
+}

@@ -66,9 +66,9 @@ def home():
 @views.route('/update_user', methods=['PUT','GET'])
 @login_required
 def update_user():
-    user_id = request.get.json().get('user_id')
-    email = request.get.json().get('email')
-    role = request.get.json().get('role')
+    user_id = request.get_json().get('user_id')
+    email = request.get_json().get('email')
+    role = request.get_json().get('role')
     user_obj = User.query.get(user_id)
     admin_count = User.query.filter_by(role=2).count()
 
