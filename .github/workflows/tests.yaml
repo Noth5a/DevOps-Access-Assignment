@@ -3,7 +3,7 @@ name: Run Unit Tests
 on:
   pull_request:
     branches:
-      - security
+      - Security
 
 jobs:
   test:
