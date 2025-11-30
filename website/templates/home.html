@@ -25,8 +25,9 @@
       <button type="button" class="btn btn-outline-dark" onClick="openUpdateModal('{{ Request.id }}', '{{ Request.requested_for_email }}', '{{ Request.access_level }}')">Update</button>
       {% if user.role == 2 %}
       <button type ="button" class="btn btn-outline-dark" style = "background-color: Green" onClick="updateState('{{ Request.id }}', '{{ Request.state }}')">Update State</button>
-      {% endif %}
       <button type ="button" class="btn btn-outline-dark" style = "background-color: red" onClick="Reject('{{ Request.id }}', '{{ Request.state }}')">Reject</button>
+      {% endif %}
+      
       <button type="button" class="close" onClick="deleteRequest('{{ Request.id }}')">
          <!-- Button to delete the Request. Calls the JavaScript function `deleteRequest` and passes the Request's ID. -->
 
@@ -58,7 +59,7 @@
    </div>
 </form>
 
-<!--Modal popup created to update Certification-->
+<!--Modal popup created to update Request-->
 <div class="modal" id="updateRequestModal" >
    <div class="modal-content">
       <h3>Update Requests

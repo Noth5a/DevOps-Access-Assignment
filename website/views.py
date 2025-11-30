@@ -3,7 +3,9 @@ from ast import If
 from copy import error
 import email
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for  
-from flask_login import login_required, current_user 
+from flask_login import login_required, current_user
+
+from website.Security import can_delete_user, can_modify_user, is_admin 
 from .models import Requests, User  
 from . import db 
 import json  
@@ -62,6 +64,34 @@ def home():
 
     # Render the home template and pass the current user object
     return render_template("home.html", user=current_user, requests=requests)
+
+
+@views.route('/update_user', methods=['PUT','GET'])
+@login_required
+def update_user():
+    user_id = request.get_json().get('user_id')
+    email = request.get_json().get('email')
+    role = request.get_json().get('role')
+    user_obj = User.query.get(user_id)
+    admin_count = User.query.filter_by(role=2).count()
+    allowed , response = can_modify_user(current_user, user_obj, admin_count)
+
+    if len(email) < 1:
+        flash('Email is required!', category='error')
+    elif len(email) > 200:
+        flash('Email is too long!', category='error')
+    elif allowed == False:
+        flash(response, category='error')
+        return jsonify({})
+    elif allowed == True:
+        user_obj.email = email
+        user_obj.role = role
+        db.session.commit()
+        flash('User updated successfully', category='success')
+    else:
+        flash('Error', category='error')
+    return jsonify({})
+
 
 # Update request route
 @views.route('/update_request', methods=['PUT','GET'])
@@ -136,6 +166,25 @@ def users():
         all_users = User.query.all()
         return render_template("Users.html", user=current_user, users=all_users)
 
+@views.route('/deleteUser', methods=['POST'])
+@login_required
+def deleteUser():
+    UserId = request.get_json().get('userId')
+    user_obj = User.query.get(UserId)
+    admin_count = User.query.filter_by(role=2).count()
+
+    allowed , response = can_delete_user(current_user, user_obj, admin_count)
+
+    if allowed == False:
+        flash(response, category='error')
+        return jsonify({})
+    elif allowed == True:
+        db.session.delete(user_obj)
+        db.session.commit()
+        flash('User deleted.', category='success')
+    else:
+        flash('Error', category='error')
+    return jsonify({})
 
 @views.route('/updateState', methods=['PUT'])
 @login_required
@@ -146,33 +195,25 @@ def update_state():
 
     if is_admin(current_user, None) == False:
         flash('Only Admins can update the request status.', category='error')
-        return jsonify({})
     elif state == 0:
         request_obj.state = 1
         db.session.commit()
-        flash('Request state Updated', category='success')
-        return redirect(url_for('views.home'))
-        
+        flash('Request state Updated', category='success') 
     elif state == 1:
         request_obj.state = 2
         db.session.commit()
         flash('Request state Updated', category='success')
-        return redirect(url_for('views.home'))
     elif state == 2:
         request_obj.state = 3
         db.session.commit()
         flash('Request state Updated', category='success')
-        return redirect(url_for('views.home'))
     elif state == 3:
         flash('Request is already completed.', category='error')
-        return redirect(url_for('views.home'))
     elif state == 4:
         flash('Request has been denied previously.', category='error')
-        return redirect(url_for('views.home'))
     else :
         flash('Invalid state value.', category='error')
-        return redirect(url_for('views.home'))
-
+    return jsonify({})
 
 @views.route('/Reject', methods = ['PUT'])
 @login_required
