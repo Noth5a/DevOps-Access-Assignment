@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func 
 
 
+
 # Setting up the Requests Table
 class Requests(db.Model):
     id = db.Column(db.Integer, primary_key=True)
