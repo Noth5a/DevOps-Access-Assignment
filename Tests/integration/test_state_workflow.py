@@ -101,11 +101,9 @@ class TestRejectionWorkflows:
 
     def test_cannot_reject_from_completed_state(self, client, app, admin, sample_request):
         """Test admin cannot reject already completed request."""
-        # First, progress the request to completed state through proper workflow
         with client.session_transaction() as sess:
             sess['_user_id'] = str(admin.id)
         
-        # Progress through states: 0 -> 1 -> 2 -> 3
         client.put('/updateState', json={'requestId': sample_request.id})  # 0 -> 1
         client.put('/updateState', json={'requestId': sample_request.id})  # 1 -> 2
         client.put('/updateState', json={'requestId': sample_request.id})  # 2 -> 3
@@ -123,8 +121,7 @@ class TestRejectionWorkflows:
         
         with app.app_context():
             req = Requests.query.get(sample_request.id)
-            # Bug fixed: rejection now correctly blocked from completed state
-            assert req.state == 3  # Correctly remains in completed state
+            assert req.state == 3 
 
 
 class TestNonAdminCannotUpdateState:
@@ -139,7 +136,6 @@ class TestNonAdminCannotUpdateState:
             json={'requestId': sample_request.id})
         
         assert response.status_code == 200
-        # App returns empty JSON, flash message shown on next page load
 
     def test_manager_cannot_update_state(self, client, manager, sample_request):
         """Test manager cannot progress request state."""
@@ -150,4 +146,3 @@ class TestNonAdminCannotUpdateState:
             json={'requestId': sample_request.id})
         
         assert response.status_code == 200
-        # App returns empty JSON, flash message shown on next page load

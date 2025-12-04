@@ -18,8 +18,6 @@ class TestUserRequestCreation:
         }, follow_redirects=True)
         
         assert response.status_code == 200
-        # Flash message may not appear if request creation fails silently
-        # Check database instead
         
         with app.app_context():
             request_obj = Requests.query.filter_by(requester_id=user.id).first()

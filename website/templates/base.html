@@ -31,16 +31,13 @@
 
 
          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-            <!-- Toggles the navbar visibility on small screens. -->
             <span class="navbar-toggler-icon"></span>
          </button>
 
          <div class="collapse navbar-collapse" id="navbar">
-            <!-- Collapsible part of the navbar. -->
 
             <div class="navbar-nav">
                {% if user.is_authenticated %}
-               <!-- If the user is logged in, display "Home" and "Logout" links. -->
                <a class="nav-item nav-link" id="Home" href="/">Home</a>
                {% if current_user.role == 2 %}
                <a class="nav-item nav-link" id="users" href="/Users">Users</a>
@@ -94,7 +91,6 @@
          {% endblock %}
       </div>
 
-      <!-- Bootstrap and jQuery JavaScript files for interactive components. -->
       <script
          src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
          integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -111,7 +107,6 @@
          crossorigin="anonymous"
       ></script>
 
-      <!-- Custom JavaScript file for additional functionality. -->
       <script
          type="text/javascript"
          src="{{ url_for('static', filename='index.js') }}"

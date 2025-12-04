@@ -13,10 +13,10 @@ from datetime import datetime
 from website.Security import can_create_request, can_delete_request, can_view_request, can_update_request, is_admin
 from website.State_Transition import get_next_state, allowed_transition
 
-# Create a Blueprint named 'views' to group related routes
+
 views = Blueprint('views', __name__)
 
-# Route for the home page that handles both GET and POST requests
+
 @views.route('/', methods=['GET', 'POST'])
 @login_required 
 def home():
@@ -46,10 +46,10 @@ def home():
             flash('Request added!', category='success')
             return redirect(url_for('views.home'))
         
-        # Redirect after POST to prevent form resubmission
+
         return redirect(url_for('views.home'))
 
-    # Query requests for GET requests
+
     print(current_user.role)
 
     if current_user.role == 2:
@@ -62,7 +62,7 @@ def home():
     print("Number of Requests:", len(requests))
     print(f"Requests fetched: {requests}")
 
-    # Render the home template and pass the current user object
+
     return render_template("home.html", user=current_user, requests=requests)
 
 
@@ -115,20 +115,20 @@ def update_request():
         access_level = request.get_json().get('access_level')
         request_obj = Requests.query.get(request_id)
         requester_id = request_obj.requester_id
-        original_requested_for_email = request_obj.requested_for_email  # Get original email for permission check
+        original_requested_for_email = request_obj.requested_for_email 
 
 
         if len(access_level) < 1:
-            flash('Access Level is required!', category='error')  # Flash an error message
+            flash('Access Level is required!', category='error')  
             return jsonify({})
         elif access_level not in ["0", "1", "2"]:
-            flash (f"Invalid access level: {access_level}. Must be one of Viewer, Editor, or Admin.", category='error')  # Flash an error message
+            flash (f"Invalid access level: {access_level}. Must be one of Viewer, Editor, or Admin.", category='error') 
             return jsonify({})
         elif len(requested_for_email) < 1:
-            flash('Requested For Email is required!', category='error')  # Flash an error message
+            flash('Requested For Email is required!', category='error')  
             return jsonify({})
         elif len(requested_for_email) > 200: 
-            flash('Requested For Email is too long!', category='error')  # Flash an error message
+            flash('Requested For Email is too long!', category='error')  
             return jsonify({})
         else:
             allowed, reason = can_update_request(current_user, original_requested_for_email, requester_id)
@@ -152,10 +152,9 @@ def update_request():
              return jsonify({}) 
 
             except Exception as e:
-         # If an error occurs, rollback the transaction and log the error
              print(f"Error: {str(e)}")
              db.session.rollback()
-             return jsonify({"message": f"Server error: {str(e)}"}), 500  # Return 500 if there is an error
+             return jsonify({"message": f"Server error: {str(e)}"}), 500 
 
 @views.route('/Users', methods=['GET'])
 @login_required
@@ -258,4 +257,4 @@ def delete_Request():
             db.session.commit()
             flash('Request deleted.', category = 'success')
 
-    return jsonify({})  # Return an empty JSON response to indicate success
+    return jsonify({}) 

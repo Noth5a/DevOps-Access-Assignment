@@ -18,9 +18,6 @@ class Requests(db.Model):
     justification = db.Column(db.String(500), nullable=True)
     teams = db.Column(db.String(300), nullable=True)
 
-
- 
-    # Relationships to fetch User objects
     requester = db.relationship('User', foreign_keys =[requester_id])
 
 

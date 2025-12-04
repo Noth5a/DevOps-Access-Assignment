@@ -110,11 +110,9 @@ function openUpdateModal(RequestId, requestedForEmail, accessLevel) {
 }
 
 function openUpdateUserModal(UserId, UserEmail, UserRole) {
-    // Populate the modal with existing data
     document.getElementById("userId").value = UserId;
     document.getElementById("updateUserEmail").value = UserEmail;
     document.getElementById("updateUserRole").value = UserRole;
-    // Show the modal
     const updateModal = new bootstrap.Modal(document.getElementById("updateUserModal"));
     updateModal.show();
 }
@@ -126,7 +124,6 @@ if (saveUpdateBtn) {
     const requestId = document.getElementById("requestId").value;
     const requestedForEmail = document.getElementById("updateRequestedForEmail").value;
     const accessLevel = document.getElementById("updateAccessLevel").value;
-    // Debug: Check if requestId is set
     console.log("Request ID Sent:", requestId);
 
     if (!requestId) {
@@ -163,7 +160,6 @@ if (saveUpdateUserBtn) {
     const userId = document.getElementById("userId").value;
     const userEmail = document.getElementById("updateUserEmail").value;
     const userRole = document.getElementById("updateUserRole").value;
-    // Debug: Check if userId is set
     console.log("User ID Sent:", userId);
 
     if (!userId) {

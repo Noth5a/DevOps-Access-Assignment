@@ -31,7 +31,7 @@ class TestUserSignup:
             'firstName': 'TestManager',
             'password1': 'password123',
             'password2': 'password123',
-            'role': 'on'  # Checkbox checked
+            'role': 'on' 
         }, follow_redirects=True)
         
         assert response.status_code == 200
@@ -88,5 +88,5 @@ class TestLoginLogout:
         response = client.get('/logout', follow_redirects=True)
         
         assert response.status_code == 200
-        # Should redirect to login page
+
         assert b'Login' in response.data
