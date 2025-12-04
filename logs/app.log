@@ -1,8 +1,34 @@
-2025-12-04 17:39:19,568 | INFO | __init__ | Application startup
-2025-12-04 17:40:01,460 | INFO | views | Request 6 state updated from 0 to 1 by user 5
-2025-12-04 17:40:03,312 | INFO | views | Request 6 state updated from 1 to 2 by user 5
-2025-12-04 17:40:05,356 | INFO | views | Request 6 state updated from 2 to 3 by user 5
-2025-12-04 17:40:07,291 | ERROR | views | Invalid state transition attempt from 3 to 3 by user 5 on request 6
-2025-12-04 17:40:17,931 | INFO | views | Request created by user 5 for email TestOther@gmail
-2025-12-04 17:40:29,363 | INFO | views | Request created by user 5 for email TestOther@gmail
-2025-12-04 17:40:32,399 | INFO | views | Request 8 state updated from 0 to 1 by user 5
+2025-12-04 19:34:22,308 | ERROR | app | Exception on / [POST]
+Traceback (most recent call last):
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\flask\app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "c:\Users\WRIGHTA\OneDrive - FUJITSU\Documents\Uni work\software dev\ASSIGNMENT YR 3\Assignment - Copy\website\views.py", line 45, in home
+    new_request = Requests(
+        requester_id=current_user.id,
+    ...<6 lines>...
+        justification="",
+    )
+  File "<string>", line 4, in __init__
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\state.py", line 571, in _initialize_instance
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\state.py", line 569, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\WRIGHTA\AppData\Roaming\Python\Python313\site-packages\sqlalchemy\orm\decl_base.py", line 2177, in _declarative_constructor
+    raise TypeError(
+        "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+    )
+TypeError: 'last_updated' is an invalid keyword argument for Requests
