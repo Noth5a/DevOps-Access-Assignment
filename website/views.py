@@ -231,7 +231,7 @@ def deleteUser():
 def update_state():
     request_id = request.get_json().get('requestId')
     request_obj = Requests.query.get(request_id)
-    state = request_obj.state if request_obj else None
+    current_state = request_obj.state if request_obj else None
 
     if not is_admin(current_user):
         flash('Only Admins can update the request status.', category='error')
@@ -239,30 +239,31 @@ def update_state():
             f"Unauthorized request state update attempt by user {current_user.id} on request {request_id}"
         )  
         return jsonify({})
-    elif state == 0:
-        request_obj.state = 1
-        db.session.commit()
-        flash('Request state Updated', category='success') 
-    elif state == 1:
-        request_obj.state = 2
-        db.session.commit()
-        flash('Request state Updated', category='success')
-    elif state == 2:
-        request_obj.state = 3
-        db.session.commit()
-        flash('Request state Updated', category='success')
-        current_app.logger.info(
-            f"Request {request_id} state updated to {request_obj.state} by user {current_user.id}"
-        )
-    elif state == 3:
-        flash('Request is already completed.', category='error')
-    elif state == 4:
-        flash('Request has been denied previously.', category='error')
-    else :
-        flash('Invalid state value.', category='error')
+    
+    # Get the next state in the approval workflow (0->1->2->3)
+    next_state = get_next_state(current_state)
+    
+    # Check if the transition is allowed
+    if not allowed_transition(current_state, next_state):
+        if current_state == 3:
+            flash('Request is already completed.', category='error')
+        elif current_state == 4:
+            flash('Request has been denied previously.', category='error')
+        else:
+            flash('Cannot progress from this state.', category='error')
         current_app.logger.error(
-            f"Invalid state value encountered by user {current_user.id} on request {request_id}"
+            f"Invalid state transition attempt from {current_state} to {next_state} by user {current_user.id} on request {request_id}"
         )
+        return jsonify({})
+    
+    # Apply the state transition
+    request_obj.state = next_state
+    db.session.commit()
+    flash('Request state Updated', category='success')
+    current_app.logger.info(
+        f"Request {request_id} state updated from {current_state} to {next_state} by user {current_user.id}"
+    )
+    
     return jsonify({})
 
 @views.route('/Reject', methods = ['PUT'])
