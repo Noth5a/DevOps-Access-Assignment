@@ -18,12 +18,16 @@
 
    <li class="list-group-item"> 
 
-      <strong>{{ Request.requested_for_email }}</strong> access: {{ Request.access_level }} created on: {{ Request.created_at }}
-            ~ Added By: {{ Request.requester.email }}
+      <strong>{{ Request.requested_for_email }}</strong>         Access: {% if Request.access_level == 0 %} Viewer {% elif Request.access_level == 1 %} Editor {% elif Request.access_level == 2 %} Authorisor {% endif %}
+            ~ Added By: {{ Request.requester.email }}  State: {% if Request.state == 0 %} Not Started {% elif Request.state == 1 %} Access Requested {% elif Request.state == 2 %} Teams requested {% elif Request.state == 3 %} Access Granted {% elif Request.state == 4 %} Access Denied {% endif %}
       <!-- Displays the Request content. -->
 
       <button type="button" class="btn btn-outline-dark" onClick="openUpdateModal('{{ Request.id }}', '{{ Request.requested_for_email }}', '{{ Request.access_level }}')">Update</button>
-
+      {% if user.role == 2 %}
+      <button type ="button" class="btn btn-outline-dark" style = "background-color: Green" onClick="updateState('{{ Request.id }}', '{{ Request.state }}')">Update State</button>
+      <button type ="button" class="btn btn-outline-dark" style = "background-color: red" onClick="Reject('{{ Request.id }}', '{{ Request.state }}')">Reject</button>
+      {% endif %}
+      
       <button type="button" class="close" onClick="deleteRequest('{{ Request.id }}')">
          <!-- Button to delete the Request. Calls the JavaScript function `deleteRequest` and passes the Request's ID. -->
 
@@ -34,15 +38,19 @@
  </ul>
 
 <form method="POST">
-   <!-- Form to add a new note. Uses POST method to submit data. -->
-
+   <!-- Form to add a new note. -->
+   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
    <div class="form-group">
       <label for="name">requested for email</label>
       <input type="text" class="form-control" id="requested_for_email" name="requested_for_email" required />
    </div>
   <div class="form-group">
    <label for="name">access level</label>
-   <input type="text" class="form-control" id="access_level" name="access_level" required />
+   <select id="access_level" name="access_level" class="form-control" required>
+      <option value="0">Viewer</option>
+      <option value="1">Editor</option>
+      <option value="2">Authoriser</option>
+   </select>
   </div>
 
    <br />
@@ -51,7 +59,7 @@
    </div>
 </form>
 
-<!--Modal popup created to update Certification-->
+<!--Modal popup created to update Request-->
 <div class="modal" id="updateRequestModal" >
    <div class="modal-content">
       <h3>Update Requests
@@ -62,15 +70,19 @@
             <label>
                 
             </label>
+            <label for="name">requested for email</label>
             <input class="form-control" type = "text" id="updateRequestedForEmail">
          </div>
+         <br />
          <div class="form group">
-            <label>
-                
-            </label>
-            <input class="form-control" type = "text" id="updateAccessLevel">
+            <label for="name">access level</label>
+            <select id="updateAccessLevel" name="access_level" class="form-control" required>
+               <option value="0">Viewer</option>
+               <option value="1">Editor</option>
+               <option value="2">Authorisor</option>
+            </select>
          </div>
-      </br>
+         <br />
          <button type="button" class="btn btn-primary" id="saveUpdateBtn" >Save changes</button>
          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </form>

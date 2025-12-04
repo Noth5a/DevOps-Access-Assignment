@@ -1,11 +1,11 @@
 # Importing Dependencies
-from flask import Blueprint, render_template, request, flash, redirect, url_for 
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app 
 from .models import User 
 from werkzeug.security import generate_password_hash, check_password_hash  
 from . import db 
 from flask_login import login_user, login_required, logout_user, current_user 
 
-# Create a Blueprint for authentication routes
+
 auth = Blueprint('auth', __name__)
 
 # Login route to handle both GET and POST requests
@@ -15,7 +15,7 @@ def login():
         email = request.form.get('email') 
         password = request.form.get('password') 
 
-        # Query the database for the user by email
+       
         user = User.query.filter_by(email=email).first()
         
         # Check if user exists and verify the password
@@ -26,10 +26,11 @@ def login():
                 return redirect(url_for('views.home')) 
             else:
                 flash('Incorrect password, try again.', category='error')  
+                current_app.logger.warning(f"Failed login attempt for email: {email}")
         else:
             flash('Email does not exist.', category='error')  
 
-    # Render login template with the current user info (if logged in)
+
     return render_template("Login.html", user=current_user)
 
 

@@ -14,12 +14,12 @@
 
    <li class="list-group-item"> 
 
-      <strong>{{ User.email }}</strong> Role: {{ User.role }} Name: {{ User.first_name }}
+      <strong>Email:</strong> {{ User.email }} <strong>Role:</strong> {% if User.role == 0 %} Viewer {% elif User.role == 1 %} Manager {% elif User.role == 2 %} Admin {% endif %} <strong>Name:</strong> {{ User.first_name }}
       <!-- Displays the User information. -->
 
-      <button type="button" class="btn btn-outline-dark" onClick="openUpdateModal('{{ User.id }}', '{{ User.email }}', '{{ User.role }}')">Update</button>
+      <button type="button" class="btn btn-outline-dark" onClick="openUpdateUserModal('{{ User.id }}', '{{ User.email }}', '{{ User.role }}')">Update</button>
 
-      <button type="button" class="close" onClick="deleteRequest('{{ User.id }}')">
+      <button type="button" class="close" onClick="deleteUser('{{ User.id }}')">
          <!-- Button to delete the User. Calls the JavaScript function `deleteRequest` and passes the User's ID. -->
 
          <span aria-hidden="true">&times;</span> 
@@ -29,4 +29,32 @@
    {% endfor %}
 </ul>
 
+<div class="modal" id="updateUserModal" >
+   <div class="modal-content">
+      <h3>Update User
+      </h3>
+      <form id="updateUser" method="PUT">
+         <input type="hidden" id="userId" name="userId">
+         <div class="form group">
+            <label>
+                
+            </label>
+            <label for="name">Email</label>
+            <input class="form-control" type = "text" id="updateUserEmail">
+         </div>
+         <br />
+         <div class="form group">
+            <label for="name">Role</label>
+            <select id="updateUserRole" name="role" class="form-control" required>
+               <option value="0">User</option>
+               <option value="1">Manager</option>
+               <option value="2">Admin</option>
+            </select>
+         </div>
+         <br />
+         <button type="button" class="btn btn-primary" id="saveUpdateUserBtn" >Save changes</button>
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </form>
+   </div>
+</div>
 {% endblock %}

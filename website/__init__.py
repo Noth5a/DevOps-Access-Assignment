@@ -1,51 +1,113 @@
 # Importing Dependencies
+import os
 from flask import Flask 
 from flask_sqlalchemy import SQLAlchemy 
 from os import path 
 from flask_login import LoginManager 
+from flask_wtf.csrf import CSRFProtect
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 
-# Initialize the database object
+
+csrf = CSRFProtect()
+
+
 db = SQLAlchemy()
-DB_NAME = "database.db"
 
-def create_app():
-    # Initialize the Flask application
+def create_app(test_config=None):
+
     app = Flask(__name__)
+    #Back-Up Variables set incase of errors, In a production environment these would not be set.
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL","sqlite:///dev.db")
     
-    app.config['SECRET_KEY'] = 'jhdfh'
+    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+    app.config['SECRET_KEY'] = SECRET_KEY
+    if test_config:
+
+        app.config.update(test_config)
+        
+    if not app.config.get("TESTING"):  
+        if app.config["SECRET_KEY"] == "dev-secret-key":
+            raise RuntimeError("SECRET_KEY must be set in production!")
+        if "sqlite:///dev.db" in app.config["SQLALCHEMY_DATABASE_URI"]:
+            raise RuntimeError("DATABASE_URL must be set in production!")
     
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-    
-    # Initialize the database with the Flask app
+
     db.init_app(app)
 
-    # Import and register the Blueprints for different routes
+    csrf.init_app(app)
+
+    # Only configure file logging if not in test mode
+    if not app.config.get('TESTING'):
+        if not os.path.exists("logs"):
+            os.mkdir("logs")
+
+        file_handler = RotatingFileHandler(
+            "logs/app.log",
+            maxBytes=10240,   # 10KB per file before rotation
+            backupCount=5     # keep 5 old logs
+        )
+
+        formatter = logging.Formatter(
+            "%(asctime)s | %(levelname)s | %(module)s | %(message)s"
+        )
+
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.INFO)
+
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info("Application startup")
+    else:
+        # In test mode, just use console logging
+        app.logger.setLevel(logging.INFO)
+
     from .views import views 
     from .auth import auth 
 
-    # Register the blueprints with URL prefixes
+
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/') 
 
 
     from .models import User, Requests
+    from werkzeug.security import generate_password_hash
 
     # Create the database if it doesn't exist yet
     with app.app_context():
-        if not path.exists('website/' + DB_NAME):
-            db.create_all() 
-            print('Created Database!')
+        db.create_all() 
+        print('Created Database!')
+        
+        # Create default admin user if it doesn't exist
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+        
+        admin_user = User.query.filter_by(email=admin_email).first()
+        if not admin_user:
+            admin_user = User(
+                email=admin_email,
+                first_name="Admin",
+                last_name="User",
+                password=generate_password_hash(admin_password, method='pbkdf2:sha256'),
+                role=2  # 2 = Admin role
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+            print(f'Created default admin user: {admin_email}')
+        else:
+            print('Admin user already exists')
 
-    # Initialize the LoginManager for managing user sessions
+
     login_manager = LoginManager()
     
-    # Define the login route to redirect unauthenticated users
+
     login_manager.login_view = 'auth.login'
     
-    # Bind the LoginManager instance to the Flask app
+
     login_manager.init_app(app)
 
-    # Define a function to load a user from the database by their ID (required by Flask-Login)
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))  

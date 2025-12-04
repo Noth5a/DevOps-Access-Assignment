@@ -7,7 +7,7 @@
 {% block content %} 
 
 <form method="POST">
-
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <h3 align="center">Sign Up</h3> 
 
@@ -40,7 +40,7 @@
 
     <div class="form-group form-check">
         <input type="checkbox" class="form-check-input" id="role" name="role" value="2" />
-        <label class="form-check-label" for="role">Sign up as Admin</label>
+        <label class="form-check-label" for="role">Sign up as a Manager</label>
     </div>
 
     <br /> 
