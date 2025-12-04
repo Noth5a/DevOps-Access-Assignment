@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - Security
+      - main
 
 jobs:
   test:

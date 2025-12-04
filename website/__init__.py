@@ -18,8 +18,7 @@ db = SQLAlchemy()
 def create_app(test_config=None):
 
     app = Flask(__name__)
-    
-    DB_NAME = os.environ.get("DATABASE_NAME")
+    #Back-Up Variables set incase of errors, In a production environment these would not be set.
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL","sqlite:///dev.db")
     
@@ -28,14 +27,12 @@ def create_app(test_config=None):
     if test_config:
 
         app.config.update(test_config)
-    else:
-
-        DB_NAME = os.environ.get("DATABASE_NAME","dev-secret-key")
-        SECRET_KEY = os.environ.get("SECRET_KEY")
-        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL","sqlite:///dev.db")
-    
-        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-        app.config['SECRET_KEY'] = SECRET_KEY
+        
+    if not app.config.get("TESTING"):  
+        if app.config["SECRET_KEY"] == "dev-secret-key":
+            raise RuntimeError("SECRET_KEY must be set in production!")
+        if "sqlite:///dev.db" in app.config["SQLALCHEMY_DATABASE_URI"]:
+            raise RuntimeError("DATABASE_URL must be set in production!")
     
 
     db.init_app(app)
