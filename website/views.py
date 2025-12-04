@@ -164,6 +164,11 @@ def update_request():
                     flash('Request not found!', category = 'error')
 
             try:
+             if request_obj is None:
+                 current_app.logger .info(
+                    f"Request {request_id} found for update by user {current_user.id}"
+                 )
+                 return flash('Request not found!', category='error')
              if requested_for_email: request_obj.requested_for_email = requested_for_email
              if last_updated: request_obj.last_updated = last_updated
              if access_level is not None: request_obj.access_level = access_level
@@ -227,6 +232,7 @@ def update_state():
     request_id = request.get_json().get('requestId')
     request_obj = Requests.query.get(request_id)
     state = request_obj.state if request_obj else None
+    allowed, response = allowed_transition(state, )
 
     if not is_admin(current_user):
         flash('Only Admins can update the request status.', category='error')

@@ -20,8 +20,8 @@ def create_app(test_config=None):
     app = Flask(__name__)
     
     DB_NAME = os.environ.get("DATABASE_NAME")
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL","sqlite:///dev.db")
     
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SECRET_KEY'] = SECRET_KEY
@@ -30,9 +30,9 @@ def create_app(test_config=None):
         app.config.update(test_config)
     else:
 
-        DB_NAME = os.environ.get("DATABASE_NAME")
+        DB_NAME = os.environ.get("DATABASE_NAME","dev-secret-key")
         SECRET_KEY = os.environ.get("SECRET_KEY")
-        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL","sqlite:///dev.db")
     
         app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
         app.config['SECRET_KEY'] = SECRET_KEY
