@@ -26,7 +26,7 @@ def client(app):
 
 @pytest.fixture
 def user(app):
-    user = User(email="User@g", role=0, first_name="TestUser", 
+    user = User(email="user@test.com", role=0, first_name="TestUser", 
                 password=generate_password_hash('password123', method='pbkdf2:sha256'))
     db.session.add(user)
     db.session.commit()
@@ -35,7 +35,7 @@ def user(app):
 
 @pytest.fixture
 def admin(app):
-    admin = User(email="Admin@gmail", role=2, first_name="TestAdmin", 
+    admin = User(email="admin@test.com", role=2, first_name="TestAdmin", 
                  password=generate_password_hash('password123', method='pbkdf2:sha256'))
     db.session.add(admin)
     db.session.commit()
@@ -44,7 +44,7 @@ def admin(app):
 
 @pytest.fixture
 def manager(app):
-    manager = User(email="Manager@g", role=1, first_name="TestManager", 
+    manager = User(email="manager@test.com", role=1, first_name="TestManager", 
                    password=generate_password_hash('password123', method='pbkdf2:sha256'))
     db.session.add(manager)
     db.session.commit()
@@ -53,7 +53,7 @@ def manager(app):
 
 @pytest.fixture
 def other_user(app):
-    other_user = User(email="Other@g", role=0, first_name="OtherUser", 
+    other_user = User(email="other@test.com", role=0, first_name="OtherUser", 
                       password=generate_password_hash('password123', method='pbkdf2:sha256'))
     db.session.add(other_user)
     db.session.commit()

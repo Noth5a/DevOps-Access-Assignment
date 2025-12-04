@@ -2,6 +2,7 @@
 from ast import If
 from copy import error
 import email
+import re
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, current_app  
 from flask_login import login_required, current_user
 from website.Security import can_delete_user, can_modify_user, is_admin 
@@ -23,6 +24,15 @@ def home():
     if request.method == 'POST':
         requested_for_email = request.form.get('requested_for_email')
         access_level = request.form.get('access_level')
+        
+        # Email validation
+        EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
+        if not re.match(EMAIL_REGEX, requested_for_email):
+            flash("Invalid email format", category='error')
+            current_app.logger.warning(
+                f"Invalid email format attempt by user {current_user.id}: {requested_for_email}"
+            )
+            return redirect(url_for('views.home'))
         
         allowed, reason = can_create_request(current_user, requested_for_email)
         if not allowed:
@@ -92,12 +102,14 @@ def update_user():
         )
         return jsonify({})
     elif allowed == True:
+        old_email = user_obj.email
+        old_role = user_obj.role
         user_obj.email = email
         user_obj.role = role
         db.session.commit()
         flash('User updated successfully', category='success')
         current_app.logger.info(
-            f"User {user_id} updated by user {current_user.id}"
+            f"User {user_id} updated by admin {current_user.id}: email changed from {old_email} to {email}, role changed from {old_role} to {role}"
         )
     else:
         flash('Error', category='error')
@@ -149,6 +161,14 @@ def update_request():
             flash('Requested For Email is too long!', category='error')  
             return jsonify({})
         else:
+            # Email validation
+            EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
+            if not re.match(EMAIL_REGEX, requested_for_email):
+                flash("Invalid email format", category='error')
+                current_app.logger.warning(
+                    f"Invalid email format in update request by user {current_user.id}: {requested_for_email}"
+                )
+                return jsonify({})
             allowed, reason = can_update_request(current_user, original_requested_for_email, requester_id)
             if not allowed:
                 flash(reason, category='error')
@@ -162,6 +182,10 @@ def update_request():
 
                 if not request_obj:
                     flash('Request not found!', category = 'error')
+                    current_app.logger.error(
+                        f"Request {request_id} not found during update attempt by user {current_user.id}"
+                    )
+                    return jsonify({})
 
             try:
              if request_obj is None:
@@ -209,13 +233,18 @@ def deleteUser():
 
     if allowed == False:
         flash(response, category='error')
+        current_app.logger.warning(
+            f"Unauthorized user deletion attempt by user {current_user.id} on user {UserId}: {response}"
+        )
         return jsonify({})
     elif allowed == True:
+        deleted_email = user_obj.email
+        deleted_role = user_obj.role
         db.session.delete(user_obj)
         db.session.commit()
         flash('User deleted.', category='success')
         current_app.logger.info(
-            f"User {UserId} deleted by user {current_user.id}"
+            f"User {UserId} (email: {deleted_email}, role: {deleted_role}) deleted by admin {current_user.id}"
         )
 
 
@@ -306,14 +335,21 @@ def delete_Request():
         if not allowed:
             flash(response, category = 'error')
             current_app.logger.warning(
-                f"Unauthorized request deletion attempt by user {current_user.id} on request {requestId}"
+                f"Unauthorized request deletion attempt by user {current_user.id} on request {requestId}: {response}"
             )
-        elif allowed: 
+        elif allowed:
+            deleted_state = request_obj.state
+            deleted_email = request_obj.requested_for_email
             db.session.delete(request_obj)  
             db.session.commit()
             flash('Request deleted.', category = 'success')
             current_app.logger.info(
-                f"Request {requestId} deleted by user {current_user.id}"
+                f"Request {requestId} (for: {deleted_email}, state: {deleted_state}) deleted by user {current_user.id}"
             )
+    else:
+        flash('Request not found.', category='error')
+        current_app.logger.error(
+            f"Request {requestId} not found during deletion attempt by user {current_user.id}"
+        )
 
     return jsonify({}) 

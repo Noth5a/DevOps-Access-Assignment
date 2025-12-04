@@ -31,4 +31,6 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(150)) 
     last_name = db.Column(db.String(150))
     role = db.Column(db.Integer, nullable=False, default= 0) # 0 User, 1 Requester, 2 Admin
+    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
    
