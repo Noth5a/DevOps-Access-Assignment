@@ -73,11 +73,31 @@ def create_app(test_config=None):
 
 
     from .models import User, Requests
+    from werkzeug.security import generate_password_hash
 
     # Create the database if it doesn't exist yet
     with app.app_context():
         db.create_all() 
         print('Created Database!')
+        
+        # Create default admin user if it doesn't exist
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+        
+        admin_user = User.query.filter_by(email=admin_email).first()
+        if not admin_user:
+            admin_user = User(
+                email=admin_email,
+                first_name="Admin",
+                last_name="User",
+                password=generate_password_hash(admin_password, method='pbkdf2:sha256'),
+                role=2  # 2 = Admin role
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+            print(f'Created default admin user: {admin_email}')
+        else:
+            print('Admin user already exists')
 
 
     login_manager = LoginManager()
